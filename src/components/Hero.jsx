@@ -4,7 +4,7 @@ import { HERO_SLIDES } from '../data/boats'
 const SCROLL_PER_SLIDE = 80
 
 export default function Hero() {
-  const heroRef = useRef(null)
+  const wrapperRef = useRef(null)  // tracks the tall scroll-container
   const [activeIdx, setActiveIdx] = useState(0)
 
   useEffect(() => {
@@ -14,12 +14,11 @@ export default function Hero() {
       if (ticking) return
       ticking = true
       requestAnimationFrame(() => {
-        const el = heroRef.current
-        if (el) {
-          const heroBottom = el.offsetTop + el.offsetHeight
-          if (window.scrollY < heroBottom) {
-            setActiveIdx(Math.floor(window.scrollY / SCROLL_PER_SLIDE) % HERO_SLIDES.length)
-          }
+        const wrapper = wrapperRef.current
+        if (wrapper) {
+          // Scroll offset relative to where the hero zone starts
+          const relativeScroll = Math.max(0, window.scrollY - wrapper.offsetTop)
+          setActiveIdx(Math.floor(relativeScroll / SCROLL_PER_SLIDE) % HERO_SLIDES.length)
         }
         ticking = false
       })
@@ -48,7 +47,8 @@ export default function Hero() {
   }
 
   return (
-    <section id="hero" ref={heroRef}>
+    <div className="hero-scroll-container" ref={wrapperRef}>
+    <section id="hero">
       {/* Background image slides */}
       <div className="hero-slides">
         {HERO_SLIDES.map((src, i) => (
@@ -98,5 +98,6 @@ export default function Hero() {
         ))}
       </div>
     </section>
+    </div>
   )
 }
